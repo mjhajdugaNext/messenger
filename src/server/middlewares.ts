@@ -26,3 +26,5 @@ export const authenticate = (
     res.status(401).send({ message: 'Unable to authenticate' });
   }
 };
+
+export const handler = () => {}
