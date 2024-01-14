@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken';
-import { IUser, IUserLogin } from './user.interface';
+import { EncodeResult, IUser, IUserLogin, User } from './user.interface';
 import UserModel from './user.model';
-import { JWT_SECRET } from '../../config';
+import { ApiError } from '../../shared/errors';
+import { encodeSession } from './jwt.utils';
 
 export const getUsers = () => UserModel.find();
 
@@ -12,41 +12,37 @@ export const getUsersBySessionToken = (sessionToken: string) =>
 
 export const getUsersById = (id: string) => UserModel.findById(id);
 
-export const createUser = (values: Record<string, any>) =>
-  new UserModel(values).save().then((user) => user.toObject());
+export const createUser = (values: Record<string, any>): Promise<User> => new UserModel(values).save().then((user) => user.toObject());
 
-export const deleteUserById = (id: string) =>
-  UserModel.findOneAndDelete({ _id: id });
+export const deleteUserById = (id: string) => UserModel.findOneAndDelete({ _id: id });
 
-export const updateUserById = (id: string, values: Record<string, any>) =>
-  UserModel.findByIdAndUpdate(id, values);
+export const updateUserById = (id: string, values: Record<string, any>) => UserModel.findByIdAndUpdate(id, values);
 
-export const register = async (user: IUser) => {
+export const register = async (user: IUser): Promise<User> => {
   const existingUser = await getUserByEmail(user.email);
 
   if (existingUser) {
-    throw new Error('User already exist');
+    throw new ApiError({ message: 'User already exist', httpCode: 401 });
   }
 
-  const userObj = new UserModel(user);
-  await userObj.save();
-
-  return user;
+  return createUser(user);
 };
 
-export const login = async (userLogin: IUserLogin) => {
+export const login = async (userLogin: IUserLogin): Promise<EncodeResult> => {
   const { email, password }: IUserLogin = userLogin;
 
   const user: any = await getUserByEmail(email);
 
-  if (!user) throw new Error('User not found');
+  if (!user) throw new ApiError({ message: 'User not exist', httpCode: 401 });
 
   const passowordMatching = await user.comparePassword(password);
-  if (!passowordMatching) {
-    throw new Error('Password is invalid');
-  }
+  if (!passowordMatching) throw new ApiError({ message: 'Password is invalid', httpCode: 401 });
 
-  const token = await jwt.sign({ id: user._id }, JWT_SECRET);
-  
-  return { token, user };
+  const session: EncodeResult = encodeSession({
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+  })
+
+  return session;
 };
