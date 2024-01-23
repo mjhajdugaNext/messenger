@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import { ApiError, ValidationError } from '../shared/errors';
 import { JWT_HADER_NAME, JWT_RENEWED_HADER_NAME } from '../config';
@@ -26,7 +25,6 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
   res.status(500).send({ message: 'Something went wrong' });
 };
 
-export const handler = () => {};
 
 export function authenticate(request: Request, response: Response, next: NextFunction) {
   const unauthorized = (message: string) => response.status(401).json({
@@ -59,7 +57,6 @@ export function authenticate(request: Request, response: Response, next: NextFun
   let session: Session;
 
   if (expiration === "grace") {
-    console.log('grace')
       // Automatically renew the session and send it back with the response
       const { token, expires, issued } = encodeSession(decodedSession.session);
       session = {

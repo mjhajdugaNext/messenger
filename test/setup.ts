@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, afterEach } from '@jest/globals';
+import { afterAll, afterEach } from '@jest/globals';
 import mongoose from 'mongoose';
 import initServer from '../src/server/initServer';
 import { Server } from 'http';
@@ -10,8 +10,6 @@ const MONGO_PASSWORD = 'password';
 const MONGO_DB_NAME = 'api_test_db';
 const MONGO_PORT = 27017;
 const SERVER_PORT = 8081;
-
-const COLLECTIONS_TO_DROP = ['users']
 
 export function functionalTestSetup(): { server: Server; app: Express } {
   let app: Express;
@@ -37,7 +35,9 @@ export function functionalTestSetup(): { server: Server; app: Express } {
 
   afterEach(async () => {
     try {
-      await Promise.all(COLLECTIONS_TO_DROP.map(collection => mongoose.connection.collections[collection].drop()));
+      const collections = await mongoose.connection.db.listCollections().toArray();
+      await Promise.all(collections.map(collection => mongoose.connection.collections[collection.name].drop()));
+      
     } catch (error) {
       console.error('Error during database cleanup after test ', error);
       throw error;
