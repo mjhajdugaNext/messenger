@@ -145,5 +145,31 @@ describe('Authentication routes', () => {
         message: 'User not exist',
       });
     });
+
+    test('returns 422 with proper message when there is no password passed', async () => {
+      const loginData = {
+        email: 'mjhajduga1@gmail.com',
+      };
+
+      const response = await request(app).post('/auth/login').send(loginData);
+
+      expect(response.status).toBe(422);
+      expect(response.body).toMatchObject({
+        message: '"password" is required'
+      });
+    });
+
+    test('returns 422 with proper message when there is no email passed', async () => {
+      const loginData = {
+        password: 'wrong password',
+      };
+
+      const response = await request(app).post('/auth/login').send(loginData);
+
+      expect(response.status).toBe(422);
+      expect(response.body).toMatchObject({
+        message: '"email" is required'
+      });
+    });
   });
 });

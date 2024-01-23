@@ -2,7 +2,7 @@ import { omit } from 'ramda';
 import Joi, { Schema } from 'joi';
 import { EncodeResult, IUser, IUserLogin, User } from './user.interface';
 import UserModel from './user.model';
-import { ApiError, ValidationError, validate } from '../../shared/errors';
+import { ApiError, validate } from '../../shared/errors';
 import { encodeSession } from './jwt.utils';
 
 export const getUsers = () => UserModel.find();
@@ -34,6 +34,8 @@ export const register = async (user: IUser): Promise<User> => {
 };
 
 export const login = async (userLogin: IUserLogin): Promise<EncodeResult> => {
+  await validate(loginValidationSchema, userLogin);
+  
   const { email, password }: IUserLogin = userLogin;
 
   const user: any = await getUserByEmail(email);
@@ -57,3 +59,8 @@ const registerValidationSchema: Schema = Joi.object({
   password: Joi.string().required(),
   email: Joi.string().email().required(),
 });
+
+const loginValidationSchema: Schema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+})
