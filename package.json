@@ -6,11 +6,11 @@
   "scripts": {
     "start": "nodemon",
     "test": "yarn-run-all --aggregate-output cov:clean -p cov:unit cov:integration -s cov:summary-preset cov:report",
-    "test:integration": "yarn-run-all cov:clean cov:integration",
+    "test:functional": "yarn-run-all cov:clean cov:functional",
     "test:unit": "yarn-run-all cov:clean cov:unit",
     "cov:clean": "rimraf .nyc_output && rimraf coverage",
     "cov:unit": "jest --forceExit --colors -c jest.config.unit.js",
-    "cov:integration": "jest -runInBand --forceExit --colors -c jest.config.integration.js --detectOpenHandles",
+    "cov:functional": "jest -runInBand --forceExit --colors -c jest.config.functional.js --detectOpenHandles",
     "cov:summary-preset": "mkdir .nyc_output && cp coverage/unit/coverage-final.json .nyc_output/unit.json && cp coverage/integration/coverage-final.json .nyc_output/integration.json",
     "cov:report": "nyc report --reporter html --reporter lcov --report-dir ./coverage/summary"
   },
@@ -39,9 +39,11 @@
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/joi": "^17.2.3",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/jwt-simple": "^0.5.36",
     "@types/mongoose": "^5.11.97",
+    "@types/ramda": "^0.29.10",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "compression": "^1.7.4",
@@ -49,9 +51,11 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
+    "joi": "^17.12.0",
     "jsonwebtoken": "^9.0.2",
     "jwt-simple": "^0.5.6",
     "loadsh": "^0.0.4",
-    "mongoose": "^8.0.3"
+    "mongoose": "^8.0.3",
+    "ramda": "^0.29.1"
   }
 }

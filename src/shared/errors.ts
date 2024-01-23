@@ -1,3 +1,5 @@
+import { Schema } from 'joi';
+
 export abstract class BaseError extends Error {
   public readonly httpCode: number;
   public readonly isOperational: boolean;
@@ -28,7 +30,9 @@ export class ApiError extends BaseError {
 
 interface ValidationErrorStructure {
   message: string;
-  field: string;
+  path: string[];
+  type: string,
+  context: any,
 }
 
 export class ValidationError extends BaseError {
@@ -44,5 +48,15 @@ export class ValidationError extends BaseError {
     });
 
     this.errors = params?.errors || [];
+  }
+}
+
+export async function validate(validationSchema: Schema, args: any) {
+  try {
+    const result = await validationSchema.validateAsync(args);
+    return result;
+
+  } catch (error) {
+    throw new ValidationError({ message: error.message, errors: error.details })
   }
 }
