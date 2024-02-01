@@ -28,10 +28,6 @@ UserSchema.methods.comparePassword = async function (
   cb: (arg: any, isMatch?: boolean) => void
 ) {
   const user: any = this;
-  // bcrypt.compare(candidatePassword, user.password, (err, isMatch) => {
-  //   if (err) return cb(err);
-  //   cb(null, isMatch);
-  // })
 
   return bcrypt.compare(candidatePassword, user.password);
 };
