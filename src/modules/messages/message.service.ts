@@ -6,10 +6,13 @@ import MessageModel from './message.model';
 import { ApiError, validate } from '../../shared/errors';
 import { mongooseDbCollectionOperation, mongooseDbOperation } from '../../shared/mongoose.helpers';
 
-export const getMessages = (): Promise<Object[]> => mongooseDbCollectionOperation(() => MessageModel.find());
+export const getMessages = (): Promise<Message[]> => {
+  return mongooseDbCollectionOperation(() => MessageModel.find()) as Promise<Message[]>;
+};
 
-export const getMessageById = (id: string): Promise<Object> =>
-  mongooseDbOperation(() => MessageModel.findOne({ _id: id }));
+export const getMessageById = (id: string): Promise<Message> => {
+  return mongooseDbOperation(() => MessageModel.findOne({ _id: id })) as Promise<Message>;
+};
 
 const createMessageValidationSchema: Schema = Joi.object({
   sender: Joi.string().required(),
@@ -32,11 +35,12 @@ export const createMessage = async (message: any): Promise<Message> => {
     archived: message.archived ?? false,
   };
 
-  const result = await new MessageModel(messageToSave).save();
-  return result.toObject();
+  return mongooseDbOperation(() => new MessageModel(messageToSave).save()) as Promise<Message>;
 };
 
-export const deleteMessageById = (id: string) => mongooseDbOperation(() => MessageModel.findOneAndDelete({ _id: id }));
+export const deleteMessageById = (id: string): Promise<Message> => {
+  return mongooseDbOperation(() => MessageModel.findOneAndDelete({ _id: id })) as Promise<Message>;
+};
 
 const updateMessageValidationSchema: Schema = Joi.object({
   sender: Joi.string(),
@@ -49,7 +53,7 @@ const updateMessageValidationSchema: Schema = Joi.object({
   archived: Joi.string(),
 });
 
-export const updateMessageById = async (id: string, message: any) => {
+export const updateMessageById = async (id: string, message: any): Promise<Message> => {
   await validate(updateMessageValidationSchema, message);
 
   const operation = async () => {
@@ -65,5 +69,6 @@ export const updateMessageById = async (id: string, message: any) => {
 
     return dbMessage.save();
   };
-  return mongooseDbOperation(operation);
+  
+  return mongooseDbOperation(operation) as Promise<Message>;
 };
