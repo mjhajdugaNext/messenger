@@ -11,6 +11,7 @@
     "cov:clean": "rimraf .nyc_output && rimraf coverage",
     "cov:unit": "jest --forceExit --colors -c jest.config.unit.js",
     "cov:functional": "jest -runInBand --forceExit --colors -c jest.config.functional.js --detectOpenHandles",
+    "cov:integration": "jest -runInBand --forceExit --colors -c jest.config.integration.js --detectOpenHandles",
     "cov:summary-preset": "mkdir .nyc_output && cp coverage/unit/coverage-final.json .nyc_output/unit.json && cp coverage/integration/coverage-final.json .nyc_output/integration.json",
     "cov:report": "nyc report --reporter html --reporter lcov --report-dir ./coverage/summary"
   },
