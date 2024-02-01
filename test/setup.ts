@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import initServer from '../src/server/initServer';
 import { Server } from 'http';
 import { Express } from 'express';
+import { io as ioc, type Socket as ClientSocket } from 'socket.io-client';
+import { Server as SocketIOServer } from 'socket.io';
 import initDatabaseConnection from '../src/database/initDatabaseConnection';
 
 const MONGO_USER = 'root';
@@ -11,42 +13,47 @@ const MONGO_DB_NAME = 'api_test_db';
 const MONGO_PORT = 27017;
 const SERVER_PORT = 8081;
 
-export function functionalTestSetup(): { server: Server; app: Express } {
+export function functionalTestSetup(): {
+  server: Server;
+  app: Express;
+  socketIOServer: SocketIOServer;
+  clientSocket: ClientSocket;
+} {
   let app: Express;
-  let server: Server;;
+  let server: Server;
+  let socketIOServer: SocketIOServer;
+  let clientSocket: ClientSocket;
 
-  // beforeAll(async () => {
   try {
     const values = initServer(SERVER_PORT);
     app = values.app;
     server = values.server;
+    socketIOServer = values.socketServer;
+    clientSocket = ioc(`http://localhost:${SERVER_PORT}`);
 
-    initDatabaseConnection(
-      MONGO_USER,
-      MONGO_PASSWORD,
-      MONGO_DB_NAME,
-      MONGO_PORT
-    );
+    initDatabaseConnection(MONGO_USER, MONGO_PASSWORD, MONGO_DB_NAME, MONGO_PORT);
   } catch (error) {
     console.error('Error when starting functional tests server ', error);
     throw error;
   }
-  // });
 
   afterEach(async () => {
     try {
-      const collections = await mongoose.connection.db.listCollections().toArray();
-      await Promise.all(collections.map(collection => mongoose.connection.collections[collection.name].drop()));
-      
+      if (mongoose.connection.db) {
+        const collections = await mongoose.connection.db.listCollections().toArray();
+        await Promise.all(collections.map((collection) => mongoose.connection.collections[collection.name].drop()));
+      }
     } catch (error) {
       console.error('Error during database cleanup after test ', error);
       throw error;
     }
-  })
+  });
 
   afterAll(async () => {
     try {
       await server.close();
+      socketIOServer.close();
+      clientSocket.disconnect();
       await mongoose.connection.close();
     } catch (error) {
       console.error('Error when shutting down functional tests server ', error);
@@ -54,5 +61,5 @@ export function functionalTestSetup(): { server: Server; app: Express } {
     }
   });
 
-  return { server, app };
+  return { server, app, socketIOServer, clientSocket };
 }

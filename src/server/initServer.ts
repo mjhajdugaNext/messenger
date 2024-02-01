@@ -2,6 +2,7 @@ import express, { Express } from 'express';
 import http, { Server } from 'http';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import { Server as SocketIOServer } from 'socket.io';
 import compression from 'compression';
 import cors from 'cors';
 import "express-async-errors";
@@ -11,6 +12,7 @@ import { errorHandler } from './middlewares';
 export default function initServer(serverPort: number): {
   server: Server;
   app: Express;
+  socketServer: SocketIOServer,
 } {
   const app: express.Express = express();
 
@@ -27,10 +29,11 @@ export default function initServer(serverPort: number): {
   app.use(errorHandler);
 
   const server: http.Server = http.createServer(app);
+  const socketServer: SocketIOServer = new SocketIOServer(server);
 
   server.listen(serverPort, () => {
     console.log(`Server running on port ${serverPort}`);
   });
 
-  return { server, app };
+  return { server, app, socketServer };
 }
