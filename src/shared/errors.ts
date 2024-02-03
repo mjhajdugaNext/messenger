@@ -13,11 +13,22 @@ export abstract class BaseError extends Error {
     this.isOperational = params?.isOperational;
     this.logging = params?.logging;
 
-    Error.captureStackTrace(this);
+    // Error.captureStackTrace(this);
   }
 }
 
 export class ApiError extends BaseError {
+  constructor(params?: { message: string; httpCode?: number; logging?: boolean }) {
+    super({
+      message: params?.message || 'Internal server error',
+      httpCode: params?.httpCode || 500,
+      isOperational: true,
+      logging: params?.logging || false,
+    });
+  }
+}
+
+export class MongooseError extends BaseError {
   constructor(params?: { message: string; httpCode?: number; logging?: boolean }) {
     super({
       message: params?.message || 'Internal server error',

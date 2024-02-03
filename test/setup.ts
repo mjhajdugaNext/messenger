@@ -63,3 +63,33 @@ export function functionalTestSetup(): {
 
   return { server, app, socketIOServer, clientSocket };
 }
+
+export function integrationTestSetup(): void {
+  try {
+    initDatabaseConnection(MONGO_USER, MONGO_PASSWORD, MONGO_DB_NAME, MONGO_PORT);
+  } catch (error) {
+    console.error('Error when starting functional tests server ', error);
+    throw error;
+  }
+
+  afterEach(async () => {
+    try {
+      if (mongoose.connection.db) {
+        const collections = await mongoose.connection.db.listCollections().toArray();
+        await Promise.all(collections.map((collection) => mongoose.connection.collections[collection.name].drop()));
+      }
+    } catch (error) {
+      console.error('Error during database cleanup after test ', error);
+      throw error;
+    }
+  });
+
+  afterAll(async () => {
+    try {
+      await mongoose.connection.close();
+    } catch (error) {
+      console.error('Error when shutting down functional tests server ', error);
+      throw error;
+    }
+  });
+}
