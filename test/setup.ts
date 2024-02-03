@@ -64,8 +64,7 @@ export function functionalTestSetup(): {
   return { server, app, socketIOServer, clientSocket };
 }
 
-export function integrationTestSetup() {}
-{
+export function integrationTestSetup(): void {
   try {
     initDatabaseConnection(MONGO_USER, MONGO_PASSWORD, MONGO_DB_NAME, MONGO_PORT);
   } catch (error) {
