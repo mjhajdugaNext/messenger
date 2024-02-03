@@ -1,13 +1,11 @@
-import { omit } from 'ramda';
-import { mergeDeepRight } from 'ramda';
 import Joi, { Schema } from 'joi';
-import { IMessage, Message, MessageToSave } from './message.interface';
+import { Message, MessageToSave, MessageType } from './message.interface';
 import MessageModel from './message.model';
-import { ApiError, validate } from '../../shared/errors';
-import { mongooseDbCollectionOperation, mongooseDbOperation } from '../../shared/mongoose.helpers';
+import { validate } from '../../shared/errors';
+import { mongooseDbOperation } from '../../shared/mongoose.helpers';
 
 export const getMessages = (): Promise<Message[]> => {
-  return mongooseDbCollectionOperation(() => MessageModel.find()) as Promise<Message[]>;
+  return mongooseDbOperation(() => MessageModel.find()) as Promise<Message[]>;
 };
 
 export const getMessageById = (id: string): Promise<Message> => {
@@ -18,8 +16,8 @@ const createMessageValidationSchema: Schema = Joi.object({
   sender: Joi.string().required(),
   receiver: Joi.string().required(),
   content: Joi.string().required(),
-  type: Joi.string().required(),
-}).unknown(true);
+  type: Joi.string().valid(MessageType.audio, MessageType.video, MessageType.video, MessageType.mixed).required(),
+});
 
 export const createMessage = async (message: any): Promise<Message> => {
   await validate(createMessageValidationSchema, message);
@@ -30,9 +28,9 @@ export const createMessage = async (message: any): Promise<Message> => {
     content: message.content,
     type: message.type,
     dateCreated: new Date().getTime(),
-    dateReceived: message.dateReceived ?? null,
-    dateRead: message.dateRead ?? null,
-    archived: message.archived ?? false,
+    dateReceived: null,
+    dateRead: null,
+    archived: false,
   };
 
   return mongooseDbOperation(() => new MessageModel(messageToSave).save()) as Promise<Message>;
@@ -46,11 +44,11 @@ const updateMessageValidationSchema: Schema = Joi.object({
   sender: Joi.string(),
   receiver: Joi.string(),
   content: Joi.string(),
-  type: Joi.string(),
+  type: Joi.string().valid(MessageType.audio, MessageType.video, MessageType.video, MessageType.mixed),
   dateCreated: Joi.number(),
   dateReceived: Joi.number(),
   dateRead: Joi.number(),
-  archived: Joi.string(),
+  archived: Joi.bool(),
 });
 
 export const updateMessageById = async (id: string, message: any): Promise<Message> => {
@@ -66,9 +64,10 @@ export const updateMessageById = async (id: string, message: any): Promise<Messa
     dbMessage.dateCreated = message.dateCreated || dbMessage.dateCreated;
     dbMessage.dateReceived = message.dateReceived || dbMessage.dateReceived;
     dbMessage.dateRead = message.dateRead || dbMessage.dateRead;
+    dbMessage.archived = message.archived || dbMessage.archived;
 
     return dbMessage.save();
   };
-  
+
   return mongooseDbOperation(operation) as Promise<Message>;
 };

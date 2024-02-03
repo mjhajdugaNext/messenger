@@ -13,8 +13,6 @@ describe('getMessages', () => {
       receiver: 'b',
       content: 'test',
       type: MessageType.text,
-      dateCreated: 0,
-      archived: false,
     });
 
     const [result] = await messageService.getMessages();
@@ -27,7 +25,6 @@ describe('getMessages', () => {
       dateCreated: expect.any(Number),
       dateReceived: null,
       dateRead: null,
-      archived: false,
     });
   });
 });
@@ -39,8 +36,6 @@ describe('createMessage', () => {
       receiver: 'b',
       content: 'test',
       type: MessageType.text,
-      dateCreated: 0,
-      archived: false,
     });
 
     const results: any = await messageService.getMessages();
@@ -55,7 +50,6 @@ describe('createMessage', () => {
       dateCreated: expect.any(Number),
       dateReceived: null,
       dateRead: null,
-      archived: false,
     });
   });
 
@@ -65,8 +59,6 @@ describe('createMessage', () => {
         receiver: 'b',
         content: 'test',
         type: MessageType.text,
-        dateCreated: 0,
-        archived: false,
       })
     ).rejects.toThrow('"sender" is required');
   });
@@ -77,8 +69,6 @@ describe('createMessage', () => {
         sender: 'a',
         content: 'test',
         type: MessageType.text,
-        dateCreated: 0,
-        archived: false,
       })
     ).rejects.toThrow('"receiver" is required');
   });
@@ -89,8 +79,6 @@ describe('createMessage', () => {
         sender: 'a',
         receiver: 'b',
         type: MessageType.text,
-        dateCreated: 0,
-        archived: false,
       })
     ).rejects.toThrow('"content" is required');
   });
@@ -101,8 +89,6 @@ describe('createMessage', () => {
         sender: 'a',
         receiver: 'b',
         content: 'test',
-        dateCreated: 0,
-        archived: false,
       })
     ).rejects.toThrow('"type" is required');
   });
@@ -115,8 +101,6 @@ describe('deleteMessageById', () => {
       receiver: 'b',
       content: 'test',
       type: MessageType.text,
-      dateCreated: 0,
-      archived: false,
     });
 
     await messageService.deleteMessageById(_id);
@@ -133,8 +117,6 @@ describe('updateUserById', () => {
       receiver: 'b',
       content: 'test',
       type: MessageType.text,
-      dateCreated: 0,
-      archived: false,
     });
 
     await messageService.updateMessageById(_id, { dateReceived: 123 });
@@ -152,8 +134,6 @@ describe('updateUserById', () => {
       receiver: 'b',
       content: 'test',
       type: MessageType.text,
-      dateCreated: 0,
-      archived: false,
     });
 
     await messageService.updateMessageById(_id, { dateRead: 123 });
@@ -165,22 +145,20 @@ describe('updateUserById', () => {
     });
   });
 
-  test('can update dateRead', async () => {
+  test('can update archived', async () => {
     const { _id }: Message = await messageService.createMessage({
       sender: 'a',
       receiver: 'b',
       content: 'test',
       type: MessageType.text,
-      dateCreated: 0,
-      archived: false,
     });
 
-    await messageService.updateMessageById(_id, { dateRead: 123 });
+    await messageService.updateMessageById(_id, { archived: true });
 
     const result = await messageService.getMessageById(_id);
     expect(result).toMatchObject({
       _id,
-      dateRead: 123,
+      archived: true,
     });
   });
 });
