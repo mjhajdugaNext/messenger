@@ -2,7 +2,6 @@ import { describe, expect, test } from '@jest/globals';
 import { integrationTestSetup } from './setup';
 import * as messageService from '../src/modules/messages/message.service';
 import { Message, MessageType } from '../src/modules/messages/message.interface';
-import { getMessageById } from '../src/modules/messages/message.service';
 
 integrationTestSetup();
 
@@ -15,8 +14,8 @@ describe('getMessages', () => {
       type: MessageType.text,
     });
 
-    const [result] = await messageService.getMessages();
-    expect(result).toMatchObject({
+    const [results] = await messageService.getMessages();
+    expect(results).toMatchObject({
       _id,
       sender: 'a',
       receiver: 'b',
@@ -38,10 +37,8 @@ describe('createMessage', () => {
       type: MessageType.text,
     });
 
-    const results: any = await messageService.getMessages();
     const result: any = await messageService.getMessageById(_id);
-    const resultToAssert = Object.create(result);
-    expect(resultToAssert).toMatchObject({
+    expect(result).toMatchObject({
       _id,
       sender: 'a',
       receiver: 'b',
@@ -91,6 +88,17 @@ describe('createMessage', () => {
         content: 'test',
       })
     ).rejects.toThrow('"type" is required');
+  });
+
+  test('throws an error when no type is not valid', async () => {
+    await expect(
+      messageService.createMessage({
+        sender: 'a',
+        receiver: 'b',
+        content: 'test',
+        type: 'asd',
+      })
+    ).rejects.toThrow('"type" must be one of [text, audio, video, mixed]');
   });
 });
 

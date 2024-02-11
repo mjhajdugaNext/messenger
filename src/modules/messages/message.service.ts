@@ -1,5 +1,5 @@
 import Joi, { Schema } from 'joi';
-import { Message, MessageToSave, MessageType } from './message.interface';
+import { Message, MessageToSave, MessageTypesArr } from './message.interface';
 import MessageModel from './message.model';
 import { validate } from '../../shared/errors';
 import { mongooseDbOperation } from '../../shared/mongoose.helpers';
@@ -16,7 +16,7 @@ const createMessageValidationSchema: Schema = Joi.object({
   sender: Joi.string().required(),
   receiver: Joi.string().required(),
   content: Joi.string().required(),
-  type: Joi.string().valid(MessageType.audio, MessageType.video, MessageType.video, MessageType.mixed).required(),
+  type: Joi.string().valid(...MessageTypesArr).required(),
 });
 
 export const createMessage = async (message: any): Promise<Message> => {
@@ -44,7 +44,7 @@ const updateMessageValidationSchema: Schema = Joi.object({
   sender: Joi.string(),
   receiver: Joi.string(),
   content: Joi.string(),
-  type: Joi.string().valid(MessageType.audio, MessageType.video, MessageType.video, MessageType.mixed),
+  type: Joi.string().valid(...MessageTypesArr),
   dateCreated: Joi.number(),
   dateReceived: Joi.number(),
   dateRead: Joi.number(),
