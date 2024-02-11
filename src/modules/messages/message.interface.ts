@@ -30,3 +30,5 @@ export enum MessageType {
   video = 'video',
   mixed = 'mixed',
 }
+
+export const MessageTypesArr = [MessageType.text, MessageType.audio, MessageType.video, MessageType.mixed];

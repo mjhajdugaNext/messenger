@@ -1,5 +1,5 @@
 import express, { Express } from 'express';
-import http, { Server } from 'http';
+import http, { Server as HttpServer } from 'http';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { Server as SocketIOServer } from 'socket.io';
@@ -8,9 +8,10 @@ import cors from 'cors';
 import "express-async-errors";
 import router from './routes';
 import { errorHandler } from './middlewares';
+import socketRoutes from './socketRoutes';
 
 export default function initServer(serverPort: number): {
-  server: Server;
+  server: HttpServer;
   app: Express;
   socketServer: SocketIOServer,
 } {
@@ -28,12 +29,14 @@ export default function initServer(serverPort: number): {
   app.use(router());
   app.use(errorHandler);
 
-  const server: http.Server = http.createServer(app);
+  const server: HttpServer = http.createServer(app);
   const socketServer: SocketIOServer = new SocketIOServer(server);
 
   server.listen(serverPort, () => {
-    console.log(`Server running on port ${serverPort}`);
+    // console.log(`Server running on port ${serverPort}`);
   });
+
+  socketRoutes(socketServer);
 
   return { server, app, socketServer };
 }

@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 import initServer from '../src/server/initServer';
 import { Server } from 'http';
 import { Express } from 'express';
-import { io as ioc, type Socket as ClientSocket } from 'socket.io-client';
 import { Server as SocketIOServer } from 'socket.io';
 import initDatabaseConnection from '../src/database/initDatabaseConnection';
 
@@ -17,20 +16,18 @@ export function functionalTestSetup(): {
   server: Server;
   app: Express;
   socketIOServer: SocketIOServer;
-  clientSocket: ClientSocket;
+  SERVER_PORT: number;
 } {
   let app: Express;
   let server: Server;
   let socketIOServer: SocketIOServer;
-  let clientSocket: ClientSocket;
 
   try {
     const values = initServer(SERVER_PORT);
     app = values.app;
     server = values.server;
     socketIOServer = values.socketServer;
-    clientSocket = ioc(`http://localhost:${SERVER_PORT}`);
-
+    
     initDatabaseConnection(MONGO_USER, MONGO_PASSWORD, MONGO_DB_NAME, MONGO_PORT);
   } catch (error) {
     console.error('Error when starting functional tests server ', error);
@@ -53,7 +50,6 @@ export function functionalTestSetup(): {
     try {
       await server.close();
       socketIOServer.close();
-      clientSocket.disconnect();
       await mongoose.connection.close();
     } catch (error) {
       console.error('Error when shutting down functional tests server ', error);
@@ -61,8 +57,9 @@ export function functionalTestSetup(): {
     }
   });
 
-  return { server, app, socketIOServer, clientSocket };
+  return { server, app, socketIOServer, SERVER_PORT };
 }
+
 
 export function integrationTestSetup(): void {
   try {
