@@ -33,7 +33,7 @@ export default function initServer(serverPort: number): {
   const socketServer: SocketIOServer = new SocketIOServer(server);
 
   server.listen(serverPort, () => {
-    console.log(`Server running on port ${serverPort}`);
+    // console.log(`Server running on port ${serverPort}`);
   });
 
   socketRoutes(socketServer);

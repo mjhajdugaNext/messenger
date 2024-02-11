@@ -50,7 +50,6 @@ export async function getClientSocket(
   waitForConnection: boolean = false
 ): Promise<ClientSocket> {
   const clientSocket: ClientSocket = ioc(`http://localhost:${serverPort}${namespace}`, { auth: { token: '' } });
-  console.log(`http://localhost:${serverPort}${namespace}`);
   if (waitForConnection) {
     await waitForSocketIOEvent(clientSocket, 'connect');
   }
