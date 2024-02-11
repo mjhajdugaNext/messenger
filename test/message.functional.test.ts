@@ -3,14 +3,14 @@ import * as messageService from '../src/modules/messages/message.service';
 import { functionalTestSetup } from './setup';
 import * as testHelpers from './testHelpers';
 import { type Socket as ClientSocket } from 'socket.io-client';
-import { IUser, User } from '../src/modules/users/user.interface';
+import { IUser, PartialUser } from '../src/modules/users/user.interface';
 
 const { SERVER_PORT } = functionalTestSetup();
 
 let clientSocketAuthorized: ClientSocket;
 let clientSocketAuthorized2: ClientSocket;
-let _user: User;
-let _user2: User;
+let _user: PartialUser;
+let _user2: PartialUser;
 
 const user1Data: IUser = {
   username: 'mjhajduga',

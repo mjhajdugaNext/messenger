@@ -5,6 +5,8 @@ const UserSchema = new mongoose.Schema({
   username: { type: String, ruquired: false },
   email: { type: String, required: true },
   password: { type: String, required: true },
+  lastActive: { type: Number, required: false, default: null },
+  active: { type: Boolean, required: true, default: false }
 });
 
 UserSchema.pre('save', async function (next) {
@@ -21,15 +23,6 @@ UserSchema.pre('save', async function (next) {
     }
   }
 });
-
-UserSchema.methods.comparePassword = async function (
-  candidatePassword: string,
-  cb: (arg: any, isMatch?: boolean) => void
-) {
-  const user: any = this;
-
-  return bcrypt.compare(candidatePassword, user.password);
-};
 
 const UserModel = mongoose.model('User', UserSchema);
 
