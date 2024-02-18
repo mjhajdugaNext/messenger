@@ -6,7 +6,28 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   lastActive: { type: Number, required: false, default: null },
-  active: { type: Boolean, required: true, default: false }
+  active: { type: Boolean, required: true, default: false },
+  friends: [
+    {
+      type: String,
+      required: false,
+      default: [],
+    },
+  ],
+  friendsWaitingRoom: [
+    {
+      type: String,
+      required: false,
+      default: [],
+    },
+  ],
+  inSomeoneWaitingRoom: [
+    {
+      type: String,
+      required: false,
+      default: [],
+    },
+  ],
 });
 
 UserSchema.pre('save', async function (next) {

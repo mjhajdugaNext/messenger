@@ -3,10 +3,12 @@ export interface IUser {
   username?: string;
   email?: string;
   password?: string;
-  lastActive?: number,
-  active?: boolean,
+  lastActive?: number;
+  active?: boolean;
+  friends?: string[];
+  friendsWaitingRoom?: string[];
+  inSomeoneWaitingRoom?: string[];
 }
-
 
 export interface IUserLogin {
   email: string;
@@ -20,13 +22,20 @@ export interface User {
   password: string;
   lastActive: number;
   active: boolean;
+  friends: string[];
+  friendsWaitingRoom: string[];
+  inSomeoneWaitingRoom: string[];
 }
 
 export const USER_DATA_TO_OMIT: string[] = ['password'];
 
+export const PUBLIC_USER_DATA_TO_OMIT: string[] = ['password', 'friends', 'friendsWaitingRoom', 'inSomeoneWaitingRoom'];
+
 export type PartialUser = Omit<User, 'password'>;
 
-export type UserToSave = Omit<User, "_id" >;
+export type PartialUserPublic = Omit<User, 'password' | 'friends' | 'friendsWaitingRoom' | 'inSomeoneWaitingRoom'>;
+
+export type UserToSave = Omit<User, '_id'>;
 
 export interface Session {
   _id: string;

@@ -25,13 +25,3 @@ export async function mongooseDbOperation(
     throw new MongooseError({ message: 'Error when performing mongoose operation' });
   }
 }
-
-export async function mongooseDbCollectionOperation(operation: any): Promise<Object[]> {
-  try {
-    const result = await operation();
-    return result.map((item: any) => item.toObject());
-  } catch (e) {
-    console.log('error', e);
-    throw new MongooseError({ message: 'Error when performing mongoose operation' });
-  }
-}

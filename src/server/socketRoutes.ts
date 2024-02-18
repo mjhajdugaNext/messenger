@@ -1,20 +1,8 @@
-import { type Socket, Server as ServerSocket } from 'socket.io';
-import * as messageHandlers from '../modules/messages/message.handler';
-import { socketAuthenticate } from './socketMiddlewares';
+import { Server as ServerSocket } from 'socket.io';
+import messageHandler from '../modules/messages/message.handler';
+import userHandler from '../modules/users/user.handler';
 
 export default function socketRoutes(socketServer: ServerSocket) {
-  const orderNamespace = socketServer.of('/messages');
-
-  orderNamespace.use(socketAuthenticate);
-
-  orderNamespace.on('connection', (socket: Socket) => {
-    const userId: string = socket.data._id;
-    socket.join(userId);
-
-    socket.on('/message/create', messageHandlers.addMessageHandler(socket, orderNamespace));
-  });
-
-  orderNamespace.on("disconnect", () => {
-    console.log('disconnection');
-  });
+  messageHandler(socketServer);
+  userHandler(socketServer);
 }
